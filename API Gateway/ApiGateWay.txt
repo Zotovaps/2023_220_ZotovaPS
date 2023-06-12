@@ -1,0 +1,420 @@
+openapi: 3.0.0
+info:
+  title: Sample API
+  version: 1.0.0
+servers:
+- url: https://d5d603o45jf9c91p4q4q.apigw.yandexcloud.net
+x-yc-apigateway:
+  service_account_id: aje67v1jou76ps6qpqlf
+  cors:
+    origin: '*'
+    methods: '*'
+    allowedHeaders: '*'
+
+paths:
+  /list/doc:
+    get:
+      x-yc-apigateway-integration:
+        type: http
+        url: https://storage.yandexcloud.net/qservice?prefix=doc&list-type=2
+  /list/pub:
+    get:
+      x-yc-apigateway-integration:
+        type: http
+        url: https://storage.yandexcloud.net/qservice?prefix=pub&list-type=2
+
+
+  /static/{file+}:
+    get:
+      summary: Serve static file from Yandex Cloud Object Storage
+      parameters:
+        - name: file
+          in: path
+          required: true
+          schema:
+            type: string
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: qservice
+        object: '{file}'
+        error_object: error.html
+  
+  /folder:
+    get:
+      description: Get folders
+      x-yc-apigateway-integration:
+        type: cloud_ydb
+        action: Scan
+        database: /ru-central1/b1g9p6kclsvdp5iaopnu/etns00jqs9alifr3e7g7
+        table_name: folder
+      operationId: getFolders
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Folder'
+                type: array
+          description: Folders
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: error
+    post:
+      security:
+        - bearerAuth: [ ]
+      description: Create folder
+      x-yc-apigateway-integration:
+        type: cloud_ydb
+        action: PutItem
+        database: /ru-central1/b1g9p6kclsvdp5iaopnu/etns00jqs9alifr3e7g7
+        table_name: folder
+      operationId: createFolder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Folder'
+        description: Folder to create
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+          description: Created or updated movie
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: error
+  /folder/{folderId}:
+    delete:
+      security:
+        - bearerAuth: [ ]
+      description: Delete folder by id
+      x-yc-apigateway-integration:
+        type: cloud_ydb
+        action: DeleteItem
+        database: /ru-central1/b1g9p6kclsvdp5iaopnu/etns00jqs9alifr3e7g7
+        table_name: folder
+        key: '{"folderId": "{folderId}"}'
+      operationId: deleteFolderById
+      parameters:
+      - description: Identifier of folder
+        explode: false
+        in: path
+        name: folderId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+          description: Deleted folder
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: error
+  /algorithm:
+    get:
+      description: Get algorithms
+      x-yc-apigateway-integration:
+        type: cloud_ydb
+        action: Scan
+        database: /ru-central1/b1g9p6kclsvdp5iaopnu/etns00jqs9alifr3e7g7
+        table_name: algorithm
+      operationId: getAlgorithms
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Algorithm'
+                type: array
+          description: Algorithms
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: error
+    post:
+      security:
+        - bearerAuth: [ ]
+      description: Create algorithm
+      x-yc-apigateway-integration:
+        type: cloud_ydb
+        action: PutItem
+        database: /ru-central1/b1g9p6kclsvdp5iaopnu/etns00jqs9alifr3e7g7
+        table_name: algorithm
+      operationId: createAlgorithm
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Algorithm'
+        description: Algorithm to create
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Algorithm'
+          description: Created or updated algorithm
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: error
+  /algorithm/{algorithmId}:
+    delete:
+      security:
+        - bearerAuth: [ ]
+      description: Delete algorithm by id
+      x-yc-apigateway-integration:
+        type: cloud_ydb
+        action: DeleteItem
+        database: /ru-central1/b1g9p6kclsvdp5iaopnu/etns00jqs9alifr3e7g7
+        table_name: algorithm
+        key: '{"algorithmId": "{algorithmId}"}'
+      operationId: deleteAlgorithmById
+      parameters:
+      - description: Identifier of algorithm
+        explode: false
+        in: path
+        name: algorithmId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Algorithm'
+          description: Deleted algorithm
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: error
+  /determinant:
+    get:
+      description: Get determinants
+      x-yc-apigateway-integration:
+        type: cloud_ydb
+        action: Scan
+        database: /ru-central1/b1g9p6kclsvdp5iaopnu/etns00jqs9alifr3e7g7
+        table_name: determinant
+      operationId: getDeterminant
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Determinant'
+                type: array
+          description: Determinant
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: error
+    post:
+      security:
+        - bearerAuth: [ ]
+      description: Create determinant
+      x-yc-apigateway-integration:
+        type: cloud_ydb
+        action: PutItem
+        database: /ru-central1/b1g9p6kclsvdp5iaopnu/etns00jqs9alifr3e7g7
+        table_name: determinant
+      operationId: createDeterminant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Determinant'
+        description: Determinant to create
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Determinant'
+          description: Created or updated determinant
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: error
+  /determinant/{determinantId}:
+    delete:
+      security:
+        - bearerAuth: [ ]
+      description: Delete determinant by id
+      x-yc-apigateway-integration:
+        type: cloud_ydb
+        action: DeleteItem
+        database: /ru-central1/b1g9p6kclsvdp5iaopnu/etns00jqs9alifr3e7g7
+        table_name: determinant
+        key: '{"determinantId": "{determinantId}"}'
+      operationId: deleteDeterminantById
+      parameters:
+      - description: Identifier of determinant
+        explode: false
+        in: path
+        name: determinantId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Determinant'
+          description: Deleted determinant
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: error
+  /rebuild:
+    get:
+      security:
+        - bearerAuth: [ ]
+      x-yc-apigateway-integration:
+        type: serverless_containers
+        container_id: bba65mmb49ker14nr711
+        service_account_id: aje3ra042jt99nnsf24j
+  /upload:
+    post:
+      security:
+        - bearerAuth: [ ]
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4e0t0eiirs34kqk8nso
+        tag: "$latest"
+        service_account_id: aje3ra042jt99nnsf24j
+  /auth:
+    put:
+      summary: Authorized operation with http basic security scheme
+      operationId: httpGetToken
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: d4ehuvjq6kjtevdt5do0
+        tag: "$latest"
+        service_account_id: aje3ra042jt99nnsf24j
+  /hello:
+    get:
+      security:
+        - bearerAuth: [ ]
+      x-yc-apigateway-integration:
+        type: dummy
+        content:
+          '*': Hello, World!
+        http_code: 200
+        http_headers:
+          Content-Type: text/plain
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      x-yc-apigateway-authorizer:
+        type: function
+        function_id: d4ehuvjq6kjtevdt5do0
+        tag: "$latest"
+        service_account_id: aje3ra042jt99nnsf24j
+  schemas:
+    Determinant:
+      properties:
+        ticks:
+          type: number
+        determinantId:
+          type: string
+        processors:
+          type: number
+        iterations:
+          type: number
+        algorithmId:
+          type: string
+        dimensions:
+          type: string
+      required:
+      - algorithmId
+      - determinantId
+      - dimensions
+      - processors
+      - ticks
+      type: object
+    Error:
+      properties:
+        message:
+          type: string
+      required:
+      - message
+      type: object
+    Folder:
+      properties:
+        nameRu:
+          type: string
+        nameEn:
+          type: string
+        parentId:
+          type: string
+        folderId:
+          type: string
+      required:
+      - folderId
+      - nameEn
+      - nameRu
+      type: object
+    Algorithm:
+      properties:
+        nameRu:
+          type: string
+        descriptionEn:
+          type: string
+        nameEn:
+          type: string
+        descriptionRu:
+          type: string
+        folderId:
+          type: string
+        dataWidth:
+          type: string
+        dataHeight:
+          type: string
+        algorithmId:
+          type: string
+      required:
+      - algorithmId
+      - folderId
+      - nameEn
+      - nameRu
+      type: object
